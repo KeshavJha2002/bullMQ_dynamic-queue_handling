@@ -7,11 +7,9 @@ async function execute_basic_queue_job(job: Job) {
   if(time>=7){
     console.log(`${job.queueName} :: ${job.id} -> added to error_queue`);
     error_queue.add(`${job.name}`, job.data, { attempts: 3, backoff: 5000 });
-    job.remove();
   } else {
       setTimeout(() => {
         console.log(`${job.queueName} :: ${job.id} -> completed and removed`);
-        job.remove();
       }, time * 1000);
     }
 }
@@ -34,12 +32,10 @@ const error_queue_worker = new Worker('error_queue', async (job: Job)=> {
     // failure
     console.log(`${job.queueName} :: ${job.id} -> added to dead_queue`);
     dead_queue.add(`${job.name}`, job.data, { attempts: 3, backoff: 5000 });
-    job.remove();
   } else {
     // success
       setTimeout(() => {
         console.log(`${job.queueName} :: ${job.id} -> completed and removed`);
-        job.remove();
       }, time * 1000);
     }
 }, { connection });
